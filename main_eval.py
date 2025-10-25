@@ -17,12 +17,12 @@ def eval():
     
     replay_path = None
 
-    config_file = "V2G_MPC.yaml"
+    config_file = r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml"
 
     env = EV2Gym(config_file=config_file,
                        load_from_replay_path=replay_path,
                        verbose=True,
-                       save_replay=True,                       
+                       save_replay=False,   # ← 这里改成 False                       
                        save_plots=save_plots,
                        )
 
