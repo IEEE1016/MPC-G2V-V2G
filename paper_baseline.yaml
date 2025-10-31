@@ -15,7 +15,9 @@ hour: 0
 minute: 0
 
 # 场景（论文偏 residential；EV2Gym里用 private 最接近）
-scenario: Residential         # 表：EV scenario = "Residential"
+# 注意：EV2Gym 中场景键为 public/private/workplace（区分大小写）。
+# 论文中的 residential 在这里用 private 最接近。
+scenario: private
 spawn_multiplier: 5           # 车辆数量强度（调这个以得到 J∈[15,120] 的EV数）
 
 # 价格：放电价系数 m（论文做敏感性分析），先设 1.0
