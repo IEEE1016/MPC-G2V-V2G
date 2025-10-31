@@ -17,7 +17,7 @@ def eval():
     
     replay_path = None
 
-    config_file = r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml"
+    config_file = r"E:\code\MPC-G2V-V2G\paper_baseline.yaml"
 
     env = EV2Gym(config_file=config_file,
                        load_from_replay_path=replay_path,
@@ -42,8 +42,8 @@ def eval():
     
     # agent = OCMF_V2G(env, control_horizon=25, verbose=False)
     # agent = OCMF_G2V(env, control_horizon=25, verbose=False)
-    # agent = eMPC_V2G(env, control_horizon=25, verbose=False)
-    agent = eMPC_G2V(env, control_horizon=25, verbose=False)
+    agent = eMPC_V2G(env, control_horizon=10, verbose=False)
+    # agent = eMPC_G2V(env, control_horizon=25, verbose=False)
 
     for t in range(env.simulation_length):        
         actions = agent.get_action(env)
