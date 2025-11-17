@@ -28,7 +28,7 @@ def eval():
         load_from_replay_path=replay_path,
         verbose=True,          # 打印环境内部的关键信息，便于调试
         save_replay=False,     # 是否保存这次仿真的回放数据（这里设为 False）
-        save_plots=save_plots, # 结束时是否由环境生成并保存图表
+        save_plots=True, # 结束时是否由环境生成并保存图表
     )
 
     # 若保存回放，通常会约定一个回放文件路径（这里演示生成路径，不实际使用）

@@ -32,10 +32,10 @@ network_info:
 # --------------------------- 仿真时间参数 ---------------------------
 timescale: 15                        # 时间步长（分钟）
 simulation_length: 96                # 一天 24h / 15min = 96 步
-year: 2022
-month: 1
-day: 17
-random_day: true                     # 每次运行随机选日期
+year: 2022                   # 年（random_day=True 时仅作范围）
+month: 1                     # 月
+day: 17                      # 日
+random_day: false                     # 每次运行随机选日期
 hour: 0                              # 起始时间：00:00
 minute: 0
 simulation_days: weekdays            # 仿真工作日（weekdays）
