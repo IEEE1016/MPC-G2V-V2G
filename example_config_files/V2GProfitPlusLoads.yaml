@@ -1,0 +1,133 @@
+# 该 yml 用于配置 EV2Gym 仿真（场景：workplace，未启用电网潮流）
+
+##############################################################################
+# 仿真总控参数
+##############################################################################
+timescale: 15                # 每步时长（分钟）
+simulation_length: 112       # 单次仿真总步数（112*15min≈28小时）
+
+##############################################################################
+# 起始日期与时间
+##############################################################################
+year: 2022                   # 年（random_day=True 时仅作范围）
+month: 1                     # 月
+day: 17                      # 日
+random_day: True             # 每次 reset 随机日期（受 simulation_days/scene 限制）
+random_hour: False           # 起始小时是否随机（True 时覆盖 hour）
+
+# 固定起始时刻（当 random_hour=False 时生效）
+hour: 5                      # 起始小时（24h）
+minute: 0                    # 起始分钟
+
+simulation_days: weekdays    # 仿真日类型：weekdays / weekends / both
+
+# 车辆到站行为
+scenario: workplace          # public / private / workplace（workplace 会过滤周末）
+spawn_multiplier: 5          # 到达强度（1 为基准；3~7 更明显；过大车辆很密集）
+
+##############################################################################
+# 电价
+##############################################################################
+discharge_price_factor: 1    # 放电电价相对充电电价的倍数（>1 放电更“值钱”）
+
+##############################################################################
+# 充电网络与电网设置
+##############################################################################
+v2g_enabled: True            # 允许车辆向电网放电（双向）
+number_of_charging_stations: 25   # 随机拓扑下的充电站数量（有拓扑文件时会被覆盖）
+number_of_transformers: 1         # 变压器数量（simulate_grid=True 且拓扑文件时会被覆盖）
+number_of_ports_per_cs: 1         # 每个充电站端口数（随机拓扑时生效）
+
+# 拓扑文件：若提供则固定桩/变压器位置与参数；None 则按上面参数随机生成
+charging_network_topology: None # ./config_files/charging_topology_10.json
+
+simulate_grid: False         # 不启用配电网潮流仿真（下方 network_info 不参与计算）
+network_info: 
+  vm_pu: 1.0                 # 电压标幺初值（simulate_grid=False 时不会用到）
+  s_base: 1000               # 基准容量（kVA）
+  load_multiplier: 1         # 负荷倍率
+  pv_scale: 80               # 光伏规模（%）
+  bus_info_file: './ev2gym/data/network_data/node_34/Nodes_34.csv'   # 节点文件
+  branch_info_file: './ev2gym/data/network_data/node_34/Lines_34.csv' # 支路文件
+  # bus_info_file: './ev2gym/data/network_data/node_123/Nodes_123.csv'
+  # branch_info_file: './ev2gym/data/network_data/node_123/Lines_123.csv'
+
+pf_solver: 'Laurent'         # 潮流求解器（simulate_grid=False 时不使用）
+
+##############################################################################
+# 跟踪指令（PST）设置
+##############################################################################
+# 相对额定功率的可变幅度（±%）。越大越容易满足跟踪目标
+power_setpoint_enabled: False # 不启用总功率跟踪目标（PST）
+power_setpoint_flexiblity: 80 # PST 可变幅度（±%）；本配置关闭 PST，此项无效
+
+##############################################################################
+# 刚性负荷、光伏、需求响应（simulate_grid=False 时这些会作用在 transformer 上）
+##############################################################################
+tr_seed: -1                  # 变压器负荷随机种子（-1 表示每次随机）
+
+# 注意：simulate_grid=True 时，下方由电网模型接管；此处为 False，因此本段生效
+inflexible_loads:            # 办公/住宅等不可调负荷
+  include: True              # 在变压器容量里考虑不可调负荷
+  inflexible_loads_capacity_multiplier_mean: 1 # 不可调负荷强度倍率
+  forecast_mean: 30          # 负荷预测均值误差（%）
+  forecast_std: 5            # 负荷预测标准差（%）
+
+solar_power:                 # 光伏
+  include: True              # 启用光伏曲线
+  solar_power_capacity_multiplier_mean: 1 # 光伏容量倍率
+  forecast_mean: 20          # 光伏预测均值误差（%）
+  forecast_std: 5            # 光伏预测标准差（%）
+
+demand_response:             # 需求响应（DR）：动态下调变压器可用容量
+  include: True              # 启用 DR
+  events_per_day: 1          # 每日事件数
+  event_capacity_percentage_mean: 35 # 容量下调均值（%）
+  event_capacity_percentage_std: 5   # 容量下调标准差（%）
+  event_length_minutes_min: 60       # 事件最短时长（分钟）
+  event_length_minutes_max: 60       # 事件最长时长（分钟）
+  event_start_hour_mean: 12          # 起始时间均值（小时）
+  event_start_hour_std: 2            # 起始时间标准差（小时）
+  notification_of_event_minutes: 60  # 控制器提前获知事件的分钟数
+
+##############################################################################
+# 车辆参数（EV）
+##############################################################################
+heterogeneous_ev_specs: True # 使用异质车辆参数（从文件加载）
+ev_specs_file: ./ev2gym/data/ev_specs_v2g_enabled2024.json # 异质参数文件路径
+
+##############################################################################
+# 默认模型参数（未提供拓扑/异质参数时作为兜底）
+##############################################################################
+# 变压器默认参数
+transformer:
+  max_power: 100             # 变压器额定功率（kW）
+
+# 充电站默认参数
+charging_station:  
+  min_charge_current: 0      # 最小充电电流（A）
+  max_charge_current: 32     # 最大充电电流（A）
+  min_discharge_current: 0   # 最小放电电流阈值（A，实际应<=0；0=禁用轻微放电）
+  max_discharge_current: -32 # 最大放电电流（A，负号=放电能力）
+  voltage: 400               # 线电压（V，线-线）
+  phases: 3                  # 相数（1/2/3）
+
+# EV 默认参数（当 heterogeneous_ev_specs=False 或单车未覆盖时使用）
+ev:
+  battery_capacity: 50       # 电池容量（kWh）
+  max_ac_charge_power: 11    # 交流最大充电功率（kW）
+  min_ac_charge_power: 0     # 交流最小充电功率（kW）
+  max_dc_charge_power: 50    # 直流最大充电功率（kW）
+  max_discharge_power: -11   # 最大放电功率（kW，负值）
+  min_discharge_power: 0     # 最小放电功率阈值（kW，0=禁放）
+  ev_phases: 3               # 车辆支持的最大相数
+  charge_efficiency: 1       # 充电效率（0~1）
+  discharge_efficiency: 1    # 放电效率（0~1）
+  transition_soc: 1          # 两阶段充电模型转折 SoC（=1 表示无降额区）
+
+  # 下列字段在异质/同质两种模式下都会用到（单车未覆盖时）
+  min_battery_capacity: 5    # 允许的最低容量（kWh）
+  min_time_of_stay: 180      # 最短停留时间（分钟）
+  min_emergency_battery_capacity: 25 # 紧急容量阈值（kWh，监控用）
+  desired_capacity: 1        # 离站目标 SoC（0~1，1=100%）
+  transition_soc_multiplier: 5 # 转折区衰减强度（越大，CCCV 区影响越“短促”）
