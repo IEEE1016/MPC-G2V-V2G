@@ -30,9 +30,9 @@ def plot_electricity_prices(config_file=r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml",
     ch_prices = np.abs(env.charge_prices[0, :])  # 充电价格
     disch_prices = np.abs(env.discharge_prices[0, :])  # 放电价格
     
-    # 创建时间轴（小时：0, 1, 2, ..., 23）
+    # 创建时间轴（小时：0, 4, 8, ..., 24）
     # 96步 = 24小时 * 4（每小时4个15分钟间隔）
-    hours = np.arange(0, 24, 1)  # 仅显示整点标签
+    hours = np.arange(0, 25, 4)  # 每4小时显示一个标签
     time_steps = np.arange(96)  # 所有96个时间步用于绘图
     time_hours = time_steps / 4  # 转换为小时（0, 0.25, 0.5, ..., 23.75）
     
@@ -43,9 +43,9 @@ def plot_electricity_prices(config_file=r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml",
     ax.step(time_hours, ch_prices, where='post', color='blue', linewidth=2.5, label='Charging Price')
     ax.step(time_hours, disch_prices, where='post', color='red', linewidth=2.5, label='Discharging Price')
     
-    # 设置x轴仅显示整点标签
+    # 设置x轴每4小时显示一个标签
     ax.set_xticks(hours)
-    ax.set_xticklabels([f'{int(h):02d}:00' for h in hours])
+    ax.set_xticklabels([f'{int(h):d}:00' for h in hours])
     
     # 设置y轴为0.15-0.35，每0.05变化一格
     y_ticks = np.arange(0.15, 0.36, 0.05)
@@ -61,11 +61,12 @@ def plot_electricity_prices(config_file=r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml",
     ax.set_title('24-Hour Electricity Price Curve', fontsize=14, fontweight='bold')
     
     # 设置坐标轴范围
-    ax.set_xlim(-0.5, 23.5)
+    ax.set_xlim(0, 24)
     ax.set_ylim(0.15, 0.35)
     
-    # 添加图例
-    ax.legend(loc='upper left', fontsize=11, framealpha=0.95)
+    # 添加图例（放在图内下方，横向显示，宽度接近时间轴）
+    ax.legend(loc='lower center', fontsize=18, framealpha=0.95, ncol=2, 
+              columnspacing=15, handlelength=4.5, handletextpad=1.8)
     
     # 紧凑布局
     plt.tight_layout()
