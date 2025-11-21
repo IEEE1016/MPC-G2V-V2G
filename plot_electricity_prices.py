@@ -39,9 +39,9 @@ def plot_electricity_prices(config_file=r"E:\code\MPC-G2V-V2G\V2G_MPC.yaml",
     # 创建图表和坐标轴
     fig, ax = plt.subplots(figsize=(14, 8))
     
-    # 绘制充电价格（蓝色）和放电价格（红色），不显示点标记
-    ax.plot(time_hours, ch_prices, color='blue', linewidth=2.5, label='Charging Price', linestyle='-')
-    ax.plot(time_hours, disch_prices, color='red', linewidth=2.5, label='Discharging Price', linestyle='-')
+    # 绘制充电价格（蓝色）和放电价格（红色），使用阶梯线（直上直下）
+    ax.step(time_hours, ch_prices, where='post', color='blue', linewidth=2.5, label='Charging Price')
+    ax.step(time_hours, disch_prices, where='post', color='red', linewidth=2.5, label='Discharging Price')
     
     # 设置x轴仅显示整点标签
     ax.set_xticks(hours)
